@@ -1,0 +1,85 @@
+1. 磁盘最大inode，剩余inode 
+2. 文件碎片问题
+3. 每个目录下文件数目最大限制，目前目录下文件个数。
+4. 系统打开的文件描述符限制，限制已经打开的文件描述符个数
+
+1. df -i
+2. filefrag
+3. ext3 32000(31998) ext4不存在限制。
+4. ulimit -n；lsof (需要root权限)
+
+*redhat2010!@#Funshion*
+6tfcvbNHY^
+todCs1CRY+3
+*redhat2010!@#Funshion*
+
+#!/bin/sh
+list_alldir(){
+    for file2 in `ls -a $1`
+    do
+        if [ x"$file2" != x"." -a x"$file2" != x".." ];then
+            if [ -d "$1/$file2" ];then
+                echo "$1/$file2"
+                list_alldir "$1/$file2"
+            fi
+        fi
+    done
+}
+
+list_alldir ./test
+
+#!/bin/bash
+ROOT_PATH=/home/guoqiang
+${ROOT_PATH}/frag.sh /media1 ${ROOT_PATH}/frag.log
+${ROOT_PATH}/frag.sh /media2 ${ROOT_PATH}/frag.log
+${ROOT_PATH}/frag.sh /media3 ${ROOT_PATH}/frag.log
+${ROOT_PATH}/frag.sh /media4 ${ROOT_PATH}/frag.log
+${ROOT_PATH}/frag.sh /media5 ${ROOT_PATH}/frag.log
+${ROOT_PATH}/frag.sh /media6 ${ROOT_PATH}/frag.log
+${ROOT_PATH}/frag.sh /media7 ${ROOT_PATH}/frag.log
+${ROOT_PATH}/frag.sh /media8 ${ROOT_PATH}/frag.log
+${ROOT_PATH}/frag.sh /media9 ${ROOT_PATH}/frag.log
+${ROOT_PATH}/frag.sh /media10 ${ROOT_PATH}/frag.log
+
+
+?	磁盘最大inode，剩余inode，仅使用了1%
+$ df -i
+Filesystem            Inodes   IUsed   IFree IUse% Mounted on
+/dev/cciss/c0d1p1    244187136   11502 244175634    1% /media1
+/dev/cciss/c0d2p1    244187136   10727 244176409    1% /media2
+/dev/cciss/c0d3p1    244187136   11000 244176136    1% /media3
+/dev/cciss/c0d4p1    244187136   10579 244176557    1% /media4
+/dev/cciss/c0d5p1    244187136   10584 244176552    1% /media5
+/dev/cciss/c0d6p1    244187136   11130 244176006    1% /media6
+/dev/cciss/c0d7p1    244187136   11362 244175774    1% /media7
+/dev/cciss/c0d8p1    244187136   11287 244175849    1% /media8
+/dev/cciss/c0d9p1    244187136   11226 244175910    1% /media9
+/dev/cciss/c0d10p1   244187136   11105 244176031    1% /media10
+
+
+?	文件碎片问题，
+完成了如下脚本，执行时间较长，结果后续提供。
+frag.sh
+stat.sh
+
+?	每个目录下文件数目最大限制，目前目录下文件个数。
+ext3文件数目最大限制为32000， ext4下无限制；
+该机器为ext3, 最大显示为32000
+
+目前目录下文件个数：
+[admin@bjdxt251 guoqiang]$ ls /media1 | wc -w
+11498
+
+?	系统打开的文件描述符限制，限制已经打开的文件描述符个数
+$ ulimit -n
+102400
+
+# lsof -p ${PID} | wc -l
+需要root权限。
+# lsof -p 12281 | wc -l
+1301
+
+查看mediaserver打开的文件句柄数，有个更简单更快捷的方法：
+# ls -l /proc/12281/fd | wc -l
+1150
+同样需要root权限。
