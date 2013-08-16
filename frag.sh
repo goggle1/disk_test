@@ -7,7 +7,7 @@ function frag_file()
 {
 	local FILE
 	FILE=$1
-	filefrag ${FILE} >> $LOG
+	/usr/sbin/filefrag ${FILE} >> $LOG
 }
 
 function list_dir()
